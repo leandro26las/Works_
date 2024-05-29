@@ -112,7 +112,7 @@ plt.ylabel('$\\left|\\sigma_{14}\\right|^2$')
 for q in range( len(delta_) ):
     A = ( 1j * delta_[q] - g14 - Pi )*( 1j * ( delta_[q] - dd[0] ) - g24 - Pi )
     B = ( 1j * delta_[q] - g14 - Pi )*( - g13 - Pi )
-    F = 1. # + ( B * abs( Omega_a )**2 + A * abs( Omega_c )**2 ) / ( A * B ) )
+    F = 1. + ( B * abs( Omega_a )**2 + A * abs( Omega_c )**2 ) / ( A * B ) )
     sigma[q] = -1j* ( (np.conj(Omega_a) * ( rho44[q] - rho11[q] ) ) / ( 1j* delta_[q] - g14 - Pi) ) + ( np.conj(Omega_a) * np.conj(Omega_c) * Omega_b ) * (
               -1j * ( ( ( A + B ) * ( rho33[q] - rho22[q] ) ) / ( F * A * B * ( - 1j * dd[0] - g23 - Pi ) ) )
               +1j * ( ( rho22[q] - rho11[q] ) / ( B * F * ( 1j * dd[0] - g12 - Pi ) ) )  
