@@ -40,16 +40,16 @@ p33_0 = 0.5
 
 def F(t, V, d_cw, d_fs, p11_, p33_, vel ):
 
-    f11 = G/2 * V[1] + G/2 * V[3] + 1j * ( np.conj( Omega_a ) * np.conj( V[4]) - Omega_a * V[4] + np.conj( Omega_s ) * np.conj( V[6] ) - Omega_s * V[6] ) - Pi * ( V[0] - p11_ )
-    f22 = - ( G + Pi ) * V[1] + 1j * ( Omega_a * V[4] - np.conj( Omega_a ) * np.conj( V[4]) + Omega_b * np.conj( V[7] ) - np.conj( Omega_b ) * V[7] ) 
-    f33 = G/2 * V[1] + G/2 * V[3] + 1j * ( np.conj( Omega_b ) * V[7] - Omega_b * np.conj( V[7] ) + np.conj( Omega_c ) * np.conj( V[9] ) - Omega_c * V[9] )  - Pi * ( V[2] - p33_ )
-    f44 = - (  G + Pi ) * V[3] + 1j * ( Omega_s * V[6] - np.conj( Omega_s ) * np.conj( V[6] ) + Omega_c * V[9] - np.conj( Omega_c ) * np.conj( V[9] ) )
-    f12 = ( 1j * (d_cw - k12 * vel ) - g12 - Pi ) * V[4] + 1j * ( np.conj( Omega_a ) * ( V[1] - V[0] ) - np.conj( Omega_b ) * V[5] + np.conj( Omega_s ) * np.conj( V[8] ) )
-    f13 = ( 1j * (  k12 - k23 ) * vel - g13 - Pi ) * V[5] + 1j * ( np.conj( Omega_a ) * V[7] + np.conj( Omega_s ) * np.conj( V[9] ) - Omega_b * V[4] - Omega_c * V[6] )
-    f14 = ( 1j * ( d_fs - ( k12 - k23 + k34 ) * vel ) - g14 - Pi ) * V[6] + 1j * ( np.conj( Omega_a ) * V[8] + np.conj( Omega_s ) * ( V[3] - V[0] ) - np.conj( Omega_c ) * V[5] )
-    f23 = (-1j * ( d_cw - k23 * vel ) - g23 - Pi ) * V[7] + 1j * ( Omega_a * V[5] - Omega_b * ( V[1] - V[2] ) - Omega_c * V[8])
-    f24 = ( 1j * ( (d_fs - k34 * vel ) - (d_cw - k23 * vel ) ) - g24 - Pi ) * V[8] + 1j * ( Omega_a * V[6] + Omega_b * V[9] - np.conj( Omega_s ) * np.conj( V[4] ) - np.conj( Omega_c ) * V[7] )
-    f34 = ( 1j * ( d_fs - k34 * vel ) - g34 - Pi ) * V[9] + 1j * ( np.conj( Omega_b ) * V[8] + np.conj( Omega_c ) * ( V[3] - V[2] ) - np.conj( Omega_s ) * np.conj( V[5] ))
+    f11 = ( G/2 * f22 + G/2 * f44 + 1j * ( np.conj( Omega_a ) * np.conj( V[4] ) - Omega_a * V[4] + np.conj( Omega_s ) * np.conj( V[6] ) - Omega_s * V[6] ) + Pi * p11_ ) / Pi
+    f22 = ( 1j * ( Omega_a * V[4] - np.conj( Omega_a ) * np.conj( V[4]) + Omega_b * np.conj( V[7] ) - np.conj( Omega_b ) * V[7] ) ) / ( G + Pi )
+    f33 = ( G/2 * V[1] + G/2 * V[3] + 1j * ( np.conj( Omega_b ) * V[7] - Omega_b * np.conj( V[7] ) + np.conj( Omega_c ) * np.conj( V[9] ) - Omega_c * V[9] ) + Pi * p33_ ) / Pi
+    f44 = ( 1j * ( Omega_s * V[6] - np.conj( Omega_s ) * np.conj( V[6] ) + Omega_c * V[9] - np.conj( Omega_c ) * np.conj( V[9] ) ) ) / ( G + Pi )
+    f12 = ( 1j * ( np.conj( Omega_a ) * ( V[1] - V[0] ) - np.conj( Omega_b ) * V[5] + np.conj( Omega_s ) * np.conj( V[8] ) ) ) / ( 1j * (d_cw - k12 * vel ) - g12 - Pi )
+    f13 = ( 1j * ( np.conj( Omega_a ) * V[7] + np.conj( Omega_s ) * np.conj( V[9] ) - Omega_b * V[4] - Omega_c * V[6] ) ) / ( 1j * (  k12 - k23 ) * vel - g13 - Pi )
+    f14 = ( 1j * ( np.conj( Omega_a ) * V[8] + np.conj( Omega_s ) * ( V[3] - V[0] ) - np.conj( Omega_c ) * V[5] ) ) / ( 1j * ( d_fs - ( k12 - k23 + k34 ) * vel ) - g14 - Pi )
+    f23 = ( 1j * ( Omega_a * V[5] - Omega_b * ( V[1] - V[2] ) - Omega_c * V[8] ) ) / (-1j * ( d_cw - k23 * vel ) - g23 - Pi )
+    f24 = ( 1j * ( Omega_a * V[6] + Omega_b * V[9] - np.conj( Omega_s ) * np.conj( V[4] ) - np.conj( Omega_c ) * V[7] ) ) / ( 1j * ( (d_fs - k34 * vel ) - (d_cw - k23 * vel ) ) - g24 - Pi )
+    f34 = ( 1j * ( np.conj( Omega_b ) * V[8] + np.conj( Omega_c ) * ( V[3] - V[2] ) - np.conj( Omega_s ) * np.conj( V[5] ) ) ) / ( 1j * ( d_fs - k34 * vel ) - g34 - Pi )
     
     return [ f11, f22, f33, f44, f12, f13, f14, f23, f24, f34 ]
 
@@ -65,9 +65,9 @@ cond_i = np.array( [ p11, p22, p33, p44, s12, s13, s14, s23, s24, s34 ], dtype =
 """         CALCULO DE POPULACOES NO TEMPO (SOLUCAO NUMERICA)           """
 # ==========================================================================
 
-# sol = solve_ivp(F, t_int, y0 = cond_i, t_eval=np.linspace(t_int[0], t_int[1], int(10 * N) ), args=( dcw[int(len(dcw)/2 - 0.5)], dfs, p11_0, p33_0, v_fx ) )
+sol = solve_ivp(F, t_int, y0 = cond_i, t_eval=np.linspace(t_int[0], t_int[1], int(10 * N) ), args=( dcw[ int( len(dcw)/2 - 0.5 ) ], dfs, p11_0, p33_0, v_fx ) )
 
-# print('SOMA POPULACOES CALCULO NUMERICO: ' + str( np.real(sol.y[0,-1]) + np.real(sol.y[1,-1]) + np.real(sol.y[2,-1]) + np.real(sol.y[3,-1]) ) + '\n' )
+print('SOMA POPULACOES CALCULO NUMERICO: ' + str( np.real(sol.y[0,-1]) + np.real(sol.y[1,-1]) + np.real(sol.y[2,-1]) + np.real(sol.y[3,-1]) ) + '\n' )
 
 # ==========================================================================
 """ CALCULO TEMPORAL DE POPULACOES SEM TEMPO DE VOO (SOLUCAO ANALITICA)"""
@@ -115,7 +115,7 @@ cond_i = np.array( [ p11, p22, p33, p44, s12, s13, s14, s23, s24, s34 ], dtype =
 # for d in range(passo):
 #     for v in range( len(v_atomos) ):
 #         sol = solve_ivp(F, t_int, y0 = cond_i, t_eval=np.linspace(t_int[0], t_int[1], int(10 * N) ), args=( dcw[d], dfs, p11_0, p33_0, v_atomos[v] ) )
-#         s14_vel[d][v] = sol.y[6,-1] * ( 1/np.sqrt(np.pi) * np.exp(- ( v_atomos[v]**2 ) ) )
+#         s14_vel[d][v] = sol.y[6,-1] 
 
 # signal = abs(s14_vel)**2
 
@@ -123,48 +123,45 @@ cond_i = np.array( [ p11, p22, p33, p44, s12, s13, s14, s23, s24, s34 ], dtype =
 """ SOLUCAO ANALITICA, EM FREQUENCIA, DA COERENCIA """
 # ==========================================================================
 
-s14_vel_alt = np.zeros( passo, dtype=complex )
+# s14_vel_alt = np.zeros((passo,len(v_atomos)), dtype=complex)
 
-for n in range(passo):
-    soma = 0.0
-    for q in range(len(v_atomos)):
-        # COM TEMPO DE VOO
-        K1 = ( 1. / (1j * ( dcw[n] - k12 * v_atomos[q] ) - g12 - Pi) - 1. / (1j * ( dcw[n] - k12 * v_atomos[q] ) + g12 + Pi) )
-        C1 = ( 1. - ( abs(Omega_a)**2 * K1 ) / (G + Pi) )
-        K2 = ( 1. / (1j * ( dfs - k34 * v_atomos[q] ) - g34 - Pi) - 1. / (1j * ( dfs - k34 * v_atomos[q] ) + g34 + Pi) )
-        C2 = ( 1. - ( abs(Omega_c)**2 * K2 ) / (G + Pi) )
-        R = ( 0.5 * G * ( abs(Omega_a)**2 / (G + Pi) ) * (K1/C1) - ( abs(Omega_a)**2 * K1 / C1 ) + Pi  )
-        S = ( 0.5 * G * ( abs(Omega_c)**2 / (G + Pi) ) * (K2/C2) - ( abs(Omega_c)**2 * K2 / C2 ) + Pi  )
-        T = 1. - ( ( G * G * abs(Omega_a)**2 * abs(Omega_c)**2 * (K1/C1) * (K2/C2) ) / ( 4 * (G + Pi)**2 * R * S ) )
+# for n in range(passo):
+#     for q in range(len(v_atomos)):
+# #         # COM TEMPO DE VOO
+# #         # K1 = ( 1. / (1j * ( dcw[n] - k12 * v_atomos[q] ) - g12 - Pi) - 1. / (1j * ( dcw[n] - k12 * v_atomos[q] ) + g12 + Pi) )
+# #         # C1 = ( 1. - ( abs(Omega_a)**2 * K1 ) / (G + Pi) )
+# #         # K2 = ( 1. / (1j * ( dfs - k34 * v_atomos[q] ) - g34 - Pi) - 1. / (1j * ( dfs - k34 * v_atomos[q] ) + g34 + Pi) )
+# #         # C2 = ( 1. - ( abs(Omega_c)**2 * K2 ) / (G + Pi) )
+# #         # R = ( 0.5 * G * ( abs(Omega_a)**2 / (G + Pi) ) * (K1/C1) - ( abs(Omega_a)**2 * K1 / C1 ) + Pi  )
+# #         # S = ( 0.5 * G * ( abs(Omega_c)**2 / (G + Pi) ) * (K2/C2) - ( abs(Omega_c)**2 * K2 / C2 ) + Pi  )
+# #         # T = 1. - ( ( G * G * abs(Omega_a)**2 * abs(Omega_c)**2 * (K1/C1) * (K2/C2) ) / ( 4 * (G + Pi)**2 * R * S ) )
 
-        p11_e = ( Pi / (R*T) ) * p11_0 - 0.5 * G * ( (abs(Omega_c)**2 * (K2/C2) * Pi ) / ( (G + Pi) * R * S * T) ) * p33_0
-        p33_e = ( Pi / (S*T) ) * p33_0 - 0.5 * G * ( ( abs(Omega_a)**2 * (K1/C1) * Pi) / ( (G + Pi) * R* S * T )) * p11_0
-        p22_e = - ( ( abs(Omega_a)**2 / (G + Pi) ) * (K1/C1) ) * p11_e
-        p44_e = - ( ( abs(Omega_c)**2 / (G + Pi) ) * (K2/C2) ) * p33_e
+# #         # p11_e = ( Pi / (R*T) ) * p11_0 - 0.5 * G * ( (abs(Omega_c)**2 * (K2/C2) * Pi ) / ( (G + Pi) * R * S * T) ) * p33_0
+# #         # p22_e = -( ( abs(Omega_a)**2 / (G + Pi) ) * (K1/C1) ) * ( (Pi/(R*T)) * p11_0 - 0.5 * G * ( (abs(Omega_c)**2 * (K2/C2) * Pi ) / ( (G + Pi) * R * S * T) ) * p33_0 )
+# #         # p33_e = ( Pi / (S*T) ) * p33_0 - 0.5 * G * ( ( abs(Omega_a)**2 * (K1/C1) * Pi) / ( (G + Pi) * R* S * T )) * p11_0
+# #         # p44_e = - ( ( abs(Omega_c)**2 / (G + Pi) ) * (K2/C2) ) * ( ( Pi/(S*T)) * p33_0 - 0.5 * G * ( ( abs(Omega_a)**2 * (K1/C1) * Pi) / ( (G + Pi) * R* S * T )) * p11_0 )
         
-        # SEM TEMPO DE VOO
-        # K1 = ( 1. / ( ( 1j * ( dcw[n] - k12 * v_atomos[q] ) - g12 ) * G ) - 1. / ( (1j * ( dcw[n] - k12 * v_atomos[q] ) + g12 ) * G ) )
-        # C1 = ( 1. - ( abs(Omega_a)**2 * K1 ) )
-        # K2 = ( 1. / ( ( 1j * ( dfs - k34 * v_atomos[q] ) - g34 ) * G ) - 1. / ( ( 1j * ( dfs - k34 * v_atomos[q] ) + g34 ) * G ) )
-        # C2 = ( 1. - ( abs(Omega_c)**2 * K2 ) )
-            
-        # p33_e = ( ( abs(Omega_c)**2 / abs(Omega_a)**2 ) * (C1 / C2 ) * ( K2 / K1 ) - 2 * K2 * ( abs(Omega_c)**2 / C2 ) + 1 ) ** (-1)
-        # p11_e = ( ( abs(Omega_c)**2 / abs(Omega_a)**2 ) * (C1 / C2 ) * ( K2 / K1 ) ) * p33_e
-        # p22_e = ( - ( abs(Omega_c)**2 / C2 ) * K2 ) * p33_e
-        # p44_e = p22_e
-            
-        A = ( 1j * ( dfs - ( k12 - k23 + k34 ) * v_atomos[q] ) - g14 - Pi) * ( 1j * ( (dfs - dcw[n]) - ( k34 - k23 ) * v_atomos[q] ) - g24 - Pi )
-        B = ( 1j * ( dfs - ( k12 - k23 + k34 ) * v_atomos[q] ) - g14 - Pi ) * ( 1j * ( k12 - k23 ) * v_atomos[q] - g13 - Pi )
-        D = 1. + ( B * abs( Omega_a )**2 + A * abs( Omega_c )**2 ) / ( A * B )
-        s14_ = -1j * ( ( np.conj(Omega_s) * ( p44_e - p11_e ) ) / ( 1j * ( dfs - ( k12 - k23 + k34 ) * v_atomos[q] ) - g14 - Pi ) ) + 1j * ( np.conj( Omega_a ) * np.conj( Omega_c ) * Omega_b ) * (
-                     ( ( A + B ) * ( p33_e - p22_e ) ) / ( D * A * B * ( 1j * ( dcw[n] - k23 * v_atomos[q] ) + g23 + Pi ) )
-                   + ( p22_e - p11_e ) / ( B * D * ( 1j * ( dcw[n] - k12 * v_atomos[q] ) - g12 - Pi ) )
-                   + ( p44_e - p33_e ) / ( A * D * ( 1j * ( dfs - k34 * v_atomos[q] ) - g34 - Pi ) )
-            )
-        ans = s14_ * ( 1. / np.sqrt( np.pi ) * np.exp( - ( v_atomos[q]**2 ) ) )
-        soma = soma + ans
-    s14_vel_alt[n] = soma
-fwm_vel_alt = abs(s14_vel_alt)**2
+# #         # SEM TEMPO DE VOO
+#         K1 = ( 1. / ( ( 1j * ( dcw[n] - k12 * v_atomos[q] ) - g12 ) * G ) - 1. / ( (1j * ( dcw[n] - k12 * v_atomos[q] ) + g12 ) * G ) )
+#         C1 = ( 1. - ( abs(Omega_a)**2 * K1 ) )
+#         K2 = ( 1. / ( ( 1j * ( dfs - k34 * v_atomos[q] ) - g34 ) * G ) - 1. / ( ( 1j * ( dfs - k34 * v_atomos[q] ) + g34 ) * G ) )
+#         C2 = ( 1. - ( abs(Omega_c)**2 * K2 ) )
+        
+#         p33_e = ( ( abs(Omega_c)**2 / abs(Omega_a)**2 ) * (C1 / C2 ) * ( K2 / K1 ) - 2 * K2 * ( abs(Omega_c)**2 / C2 ) + 1 ) ** (-1)
+#         p11_e = ( ( abs(Omega_c)**2 / abs(Omega_a)**2 ) * (C1 / C2 ) * ( K2 / K1 ) ) * p33_e
+#         p22_e = ( - ( abs(Omega_c)**2 / C2 ) * K2 ) * p33_e
+#         p44_e = p22_e
+        
+#         A = ( 1j * ( dfs - ( k12 - k23 + k34 ) * v_atomos[q] ) - g14 ) * ( 1j * ( (dfs - dcw[n]) - ( k34 - k23 ) * v_atomos[q] ) - g24 )
+#         B = ( 1j * ( dfs - ( k12 - k23 + k34 ) * v_atomos[q] ) - g14 ) * ( 1j * ( k12 - k23 ) * v_atomos[q] - g13 )
+#         D = 1. + ( B * abs( Omega_a )**2 + A * abs( Omega_c )**2 ) / ( A * B )
+#         s14_ = -1j * ( ( np.conj(Omega_s) * ( p44_e - p11_e ) ) / ( 1j * ( dfs - ( k12 - k23 + k34 ) * v_atomos[q] ) - g14 - Pi ) ) + 1j * ( np.conj( Omega_a ) * np.conj( Omega_c ) * Omega_b ) * (
+#                      ( ( A + B ) * ( p33_e - p22_e ) ) / ( D * A * B * ( 1j * ( dcw[n] - k23 * v_atomos[q] ) + g23 ) )
+#                    + ( p22_e - p11_e ) / ( B * D * ( 1j * ( dcw[n] - k12 * v_atomos[q] ) - g12 ) )
+#                    + ( p44_e - p33_e ) / ( A * D * ( 1j * ( dfs - k34 * v_atomos[q] ) - g34 ) )
+#         )
+#         s14_vel_alt[n][q] = s14_ * ( 1. / np.sqrt( np.pi ) * np.exp( - ( v_atomos[q]**2 ) ) )
+# fwm_vel_alt = abs(s14_vel_alt)**2
 
 # ==========================================================================
 """         CALCULO NUMERICO, EM FREQUENCIA, PARA TRANSMISSAO           """
@@ -181,10 +178,10 @@ fwm_vel_alt = abs(s14_vel_alt)**2
 """                 PLOTS (POPULACAO X TEMPO)                           """
 # ==========================================================================
 
-# plt.plot(sol.t, np.real(sol.y[0,:]), label='p11 - Numerico' )
-# plt.plot(sol.t, np.real(sol.y[1,:]), label='p22 - Numerico' )
-# plt.plot(sol.t, np.real(sol.y[2,:]), label='p33 - Numerico' )
-# plt.plot(sol.t, np.real(sol.y[3,:]), label='p44 - Numerico' )
+plt.plot(sol.t, np.real(sol.y[0,:]), label='p11 - Numerico' )
+plt.plot(sol.t, np.real(sol.y[1,:]), label='p22 - Numerico' )
+plt.plot(sol.t, np.real(sol.y[2,:]), label='p33 - Numerico' )
+plt.plot(sol.t, np.real(sol.y[3,:]), label='p44 - Numerico' )
 
 # plt.axhline(y= np.real(p11_e), xmin = min(sol.t), xmax = max(sol.t), label='p11 - Analitico', c = 'k', ls = '--')
 # plt.axhline(y= np.real(p22_e), xmin = min(sol.t), xmax = max(sol.t), label='p22 - Analitico', c = 'k', ls = '--')
@@ -200,12 +197,23 @@ fwm_vel_alt = abs(s14_vel_alt)**2
 # ==========================================================================
 
 # plt.plot(dcw, signal[:, 0], label='FWM - Numerico - v(m/s) = ' + str(v_atomos[0]), lw = 1.0)
+# plt.plot(dcw, signal[:, int( v_atomos[0] + v_atomos[-1] ) ], label='FWM - Numerico - v(m/s) = ' + str( v_atomos[0] + v_atomos[-1] ), lw = 1.0)
+# plt.plot(dcw, signal[:, -1], label='FWM - Numerico - v(m/s) = ' + str(v_atomos[-1]), lw = 1.0)
 
-plt.plot(dcw, fwm_vel_alt, c = 'k', label = 'FWM - Analitico ', ls = '--', lw = 2.0)
+# plt.plot(dcw, fwm_vel_alt[:,0], c = 'r', label = 'FWM - Analitico - v(m/s) = ' + str(v_atomos[0]), ls = '--', lw = 1.0)
+# # plt.plot(dcw, fwm_vel_alt[:, int(len(v_atomos)/2 - 0.5) ], c = 'g', label = 'FWM - Analitico - v(m/s) = ' + str(v_atomos[0] + v_atomos[-1]), ls = '--', lw = 1.0)
+# plt.plot(dcw, fwm_vel_alt[:,-1], c = 'k', label = 'FWM - Analitico - v(m/s) = ' + str(v_atomos[-1]), ls = '--', lw = 1.0)
+# plt.xlabel(' $ \\delta_{cw} $ ( $ \\Gamma $) ')
+# plt.ylabel('$ \\left| \\sigma_{14} \\right|^2 $')
+# plt.title(" $\\Omega_{s}$ = " + str(s) + "$\\Gamma$, $\\Omega_{F}^{cw}$ = " + str(a) + "$\\Gamma$, $\\Omega_{f}^{cw}$ = "+ str(b) + "$\\Gamma$, $\\Omega_{fs} = $" + str(c) + "$\\Gamma$ \n $\\Pi = $" + str(r) + "$\\Gamma$, $\\gamma_{13} = \\gamma_{24} = $" + str(k) + "$\\Gamma$ \n $\\delta_{fs} = $" + str(0.0) )
 
-plt.xlabel(' $ \\delta_{cw} $ ( $ \\Gamma $) ')
-plt.ylabel('$ \\left| \\sigma_{14} \\right|^2 $')
-plt.title(" $\\Omega_{s}$ = " + str(s) + "$\\Gamma$, $\\Omega_{F}^{cw}$ = " + str(a) + "$\\Gamma$, $\\Omega_{f}^{cw}$ = "+ str(b) + "$\\Gamma$, $\\Omega_{fs} = $" + str(c) + "$\\Gamma$ \n $\\Pi = $" + str(r) + "$\\Gamma$, $\\gamma_{13} = \\gamma_{24} = $" + str(k) + "$\\Gamma$ \n $\\delta_{fs} = $" + str(0.0) )
+# plt.plot(v_atomos, fwm_vel_alt[int(len(v_atomos)/2 - 0.5)][:], c = 'k', label = 'FWM - Analitico', ls = '--', lw = 2.0)
+# plt.plot(v_atomos, fwm_vel_alt[-1][:], c = 'r', label = 'FWM - Analitico', ls = '--', lw = 2.0)
+# plt.plot(v_atomos, fwm_vel_alt[0][:], c = 'g', label = 'FWM - Analitico', ls = '--', lw = 2.0)
+# plt.xlabel(' $ v $ ( m/s ) ')
+
+# plt.ylabel('$ \\left| \\sigma_{14} \\right|^2 $')
+# plt.title(" $\\Omega_{s}$ = " + str(s) + "$\\Gamma$, $\\Omega_{F}^{cw}$ = " + str(a) + "$\\Gamma$, $\\Omega_{f}^{cw}$ = "+ str(b) + "$\\Gamma$, $\\Omega_{fs} = $" + str(c) + "$\\Gamma$ \n $\\Pi = $" + str(r) + "$\\Gamma$, $\\gamma_{13} = \\gamma_{24} = $" + str(k) + "$\\Gamma$ \n $\\delta_{fs} = $" + str(0.0) )
 
 # ==========================================================================
 """                 PLOT TRANSMISSAO (SOLUCAO NUMERICA)                 """
