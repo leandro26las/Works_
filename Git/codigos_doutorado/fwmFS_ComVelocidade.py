@@ -5,10 +5,6 @@ from scipy.integrate import solve_ivp
 from scipy.constants import gas_constant
 import streamlit as st
 
-fig, ax = plt.subplots()
-st.set_page_config(layout='wide')
-col1, col2 = st.columns(2)
-
 G = 1e-0        # ORDEM DE TX DECAIMENTO GAMMA
 a = 9e-1        # ORDEM DE GAMMA_A (CONTROLE)
 b = 5e-2        # ORDEM DE GAMMA_B (PROVA)
@@ -18,7 +14,7 @@ m = 5e-1        # ORDEM DE TX DECAIMENTO COERENCIAS
 k = 0e-8        # ORDEM DE TX DECAIMENTO g13, g24
 r = 1e-3        # ORDEM DO VALOR DE Pi
 
-N = 500         # TAMANHO DO VETOR TEMPO
+N = 5000         # TAMANHO DO VETOR TEMPO
 temp = 327.15   
 
 M = (0.278 * 86.91 + 0.722 * 84.91) / 1e3                    # MASSAS 85Rb: 84.91 u, 87Rb: 86.91 u
@@ -72,52 +68,17 @@ cond_i = np.array( [ p11, p22, p33, p44, s12, s13, s14, s23, s24, s34 ], dtype =
 """         CALCULO DE POPULACOES NO TEMPO (SOLUCAO NUMERICA)           """
 # ==========================================================================
 
-sol = solve_ivp( F, t_int, y0 = cond_i, t_eval = np.linspace( t_int[0], t_int[1], int(10 * N ) ), args=( dcw[ int(len(dcw)/2 - 0.5) ], dfs, p11_0, p33_0, v ) )
 
-fig1 = go.Figure(sol, x = sol.t, y = np.real(sol.y[0,:]))
+sol = solve_ivp( F, t_int, y0 = cond_i, method='RK45', t_eval=np.linspace( t_int[0], t_int[-1], 100 * N + 1, endpoint=True), args=( -100, dfs, p11_0, p33_0, 60.0) )
 
-# ax.plot(sol.t, np.real(sol.y[0,:]), label='p11 - Numerico' )
-# ax.plot(sol.t, np.real(sol.y[1,:]), label='p22 - Numerico' )
-# ax.plot(sol.t, np.real(sol.y[2,:]), label='p33 - Numerico' )
-# ax.plot(sol.t, np.real(sol.y[3,:]), label='p44 - Numerico' )
-
-# ax.axhline(y= np.real(p11_e), xmin = min(sol.t), xmax = max(sol.t), label='p11 - Analitico', c = 'k', ls = '--')
-# ax.axhline(y= np.real(p22_e), xmin = min(sol.t), xmax = max(sol.t), label='p22 - Analitico', c = 'k', ls = '--')
-# ax.axhline(y= np.real(p33_e), xmin = min(sol.t), xmax = max(sol.t), label='p33 - Analitico', c = 'k', ls = '--')
-# ax.axhline(y= np.real(p44_e), xmin = min(sol.t), xmax = max(sol.t), label='p44 - Analitico', c = 'k', ls = '--')
-
-plt.title(" $\\Omega_{s}$ = " + str(c) + "$\\Gamma$, $\\Omega_{c}$ = " + str(a) + "$\\Gamma$, $\\Omega_{p}$ = "+ str(b) + "$\\Gamma$, $\\Omega_{fs} = $" + str(c) + "$\\Gamma$ \n $\\Pi = $" + str(r) + "$\\Gamma$, $\\gamma_{13} = \\gamma_{24} = $" + str(k) + "$\\Gamma$ \n $\\delta_{cw} = $" + str(dcw[int(len(dcw)/2 - 0.5)]) + ", $\\delta_{fs} = $" + str(0.0) + ", v(m/s) = " + str( round(v,2) ) )
-plt.xlabel('tempo (u.a)')
-plt.ylabel('Populacao')
-plt.legend(loc='best')
+plt.plot(sol.t, sol.y[0, : ], label='$\\rho_{11}$' )
+plt.plot(sol.t, sol.y[1, : ], label='$\\rho_{22}$' )
+plt.plot(sol.t, sol.y[2, : ], label='$\\rho_{33}$' )
+plt.plot(sol.t, sol.y[3, : ], label='$\\rho_{44}$' )
 
 # print('SOMA POPULACOES CALCULO NUMERICO: ' + str( np.real(sol.y[0,-1]) + np.real(sol.y[1,-1]) + np.real(sol.y[2,-1]) + np.real(sol.y[3,-1]) ) + '\n' )
 
-# ==========================================================================
-#       CALCULO TEMPORAL DE POPULACOES COM TEMPO DE VOO (SOLUCAO ANALITICA)
-# ==========================================================================
-
-# ==========================================================================
-#                  CALCULO NUMERICO, EM FREQUENCIA, PARA COERENCIA 14           
-# ==========================================================================
-
-# ==========================================================================
-#           CALCULO NUMERICO DAS EQUAÇÕES NOS ESTADOS ESTACIONÁRIOS         
-# ==========================================================================
-
-# ==========================================================================
-#                SOLUCAO ANALITICA, EM FREQUENCIA, DA COERENCIA
-# ==========================================================================
-
-# ==========================================================================
-#                CALCULO NUMERICO, EM FREQUENCIA, PARA TRANSMISSAO
-# ==========================================================================
-
-# ==========================================================================
-#                                     DASHBOARD
-# ==========================================================================
-
-with st.sidebar:
-    st.slider('Velocidade', v_atomos[0], v_atomos[-1] )
-
-col1.pyplot(fig)
+# plt.title(" $\\Omega_{s}$ = " + str(c) + "$\\Gamma$, $\\Omega_{c}$ = " + str(a) + "$\\Gamma$, $\\Omega_{p}$ = "+ str(b) + "$\\Gamma$, $\\Omega_{fs} = $" + str(c) + "$\\Gamma$ \n $\\Pi = $" + str(r) + "$\\Gamma$, $\\gamma_{13} = \\gamma_{24} = $" + str(k) + "$\\Gamma$ \n $\\delta_{cw} = $" + str(dcw[int(len(dcw)/2 - 0.5)]) + ", $\\delta_{fs} = $" + str(0.0) + ", v(m/s) = " + str( round(v,2) ) )
+# plt.xlabel('tempo (u.a)')
+# plt.ylabel('Populacao')
+# plt.legend(loc='best')

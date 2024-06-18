@@ -5,11 +5,10 @@
 
 import streamlit as st
 import pandas as pd
-import seaborn as sns
 import numpy as np
-import matplotlib.pyplot as plt
 import plotly.express as px
-import plotly.graph_objects as go
+import plotly.io as pio
+from sklearn.preprocessing import StandardScaler
 
 path = r'F:\Git\Git\Cursos\MachineLearning\credit_risk_dataset.csv'
 
@@ -50,26 +49,40 @@ possui_historico_divida = nova_base['cb_person_default_on_file']
 idade_pessoas = nova_base['person_age'].sort_values()
 taxa_juros = nova_base['loan_int_rate']
 
-# X_credit = nova_base.iloc[:, [1, 3, 6, 7, 9, 11]]
-# Y_credit = nova_base.iloc[:, [0, 2, 4, 5, 8, 10]]
+X_credit = nova_base.iloc[:, [1, 3, 6, 7, 9, 11]]
+Y_credit = nova_base.iloc[:, [0, 2, 4, 5, 8, 10]]
 
+scaler_credit = StandardScaler()
+X_credit = scaler_credit.fit_transform(X_credit)
+
+
+
+
+#################################################################################################################################################
 col1, col2, col3 = st.columns(3)
 col4, col5, col6 = st.columns(3)
 
-fig_taxa_emprestimo = px.scatter(nova_base, x = 'person_age', y = 'loan_int_rate',
-                             color = 'loan_grade', size= 'loan_int_rate',
-                             title="Taxa de Juros X Idade")
-col1.plotly_chart(fig_taxa_emprestimo, use_container_width=True)
+fig_histo_idade = px.histogram(nova_base, x='person_age', title="Distribuicao de Idades",
+                        labels={"person_age": "Idade"})
+col1.plotly_chart(fig_histo_idade, use_container_width=True)
+
+fig_taxa_emprestimo = px.scatter(nova_base, x = 'loan_int_rate', y = 'person_income',
+                            animation_frame=idade_pessoas, color = 'loan_grade',
+                            size= 'loan_int_rate',
+                            labels=({'loan_int_rate': 'Taxa de Juros', 'person_income': 'Salario', 'loan_grade': 'Nota de Score'})
+                            title="Taxa de Juros X Idade")
+
+col2.plotly_chart(fig_taxa_emprestimo, use_container_width=True)
 
 fig_intecao = px.pie(nova_base, values='loan_amnt', names='loan_intent', title= r'% Intenção do Emprestimo')
-col2.plotly_chart(fig_intecao, use_container_width=True)
+col3.plotly_chart(fig_intecao, use_container_width=True)
 
 fig_loan_grade = px.bar(nova_base, x='loan_grade', y='loan_amnt', color='loan_intent', 
                         labels={"loan_intent": "Loan Intent", "loan_amnt": "Loan Amount", "loan_grade": "Loan Grade"},
                          category_orders = {"loan_grade": ["A", "B", "C", "D", "E", "F", "G"]} )
-col3.plotly_chart(fig_loan_grade, use_container_width=True)
+col4.plotly_chart(fig_loan_grade, use_container_width=True)
 
 fig_taxa_intencao = px.scatter(nova_base, x = 'person_age', y = 'loan_int_rate',
                              color = 'loan_intent', size= 'loan_int_rate',
                              title="Taxa de Juros X Idade")
-col4.plotly_chart(fig_taxa_intencao, use_container_width=True)
+col5.plotly_chart(fig_taxa_intencao, use_container_width=True)
