@@ -69,7 +69,7 @@ col1.plotly_chart(fig_histo_idade, use_container_width=True)
 fig_taxa_emprestimo = px.scatter(nova_base, x = 'loan_int_rate', y = 'person_income',
                             animation_frame=idade_pessoas, color = 'loan_grade',
                             size= 'loan_int_rate',
-                            labels=({'loan_int_rate': 'Taxa de Juros', 'person_income': 'Salario', 'loan_grade': 'Nota de Score'})
+                            labels=({'loan_int_rate': 'Taxa de Juros', 'person_income': 'Salario', 'loan_grade': 'Nota de Score'}),
                             title="Taxa de Juros X Idade")
 
 col2.plotly_chart(fig_taxa_emprestimo, use_container_width=True)

@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.constants import gas_constant
+from numba import njit, jit
+import time
+
 
 temp = 327.15
 G = 1e-0        # ORDEM DE TX DECAIMENTO GAMMA
@@ -31,8 +34,17 @@ kfs = 2*np.pi / 795e-9
 
 def dVdt(t, V, delta, p11_0, p33_0, Dcw):
 
-    p11, p22, p33, p44, s12, s13, s14, s23, s34 = V
-    del_cw, del_fs = delta
+    p11 = V[0]
+    p22 = V[1]
+    p33 = V[2]
+    p44 = V[3]
+    s12 = V[4]
+    s13 = V[5]
+    s14 = V[6]
+    s23 = V[7]
+    s24 = V[8]
+    s34 = V[9]
+    del_cw, del_fs = delta[0], delta[1]
 
     f11 = G/2 * (p22 + p44) + 1j * ( np.conj( Omega_a ) * np.conj( s12 ) - Omega_a * s12 + np.conj( Omega_c ) * np.conj( s14 ) - Omega_c * s14 ) - Pi * ( p11 - p11_0 )
     f22 = - ( G + Pi ) * p22 + 1j * ( Omega_a * s12 - np.conj( Omega_a ) * np.conj( s12 ) + Omega_b * np.conj( s23 ) - np.conj( Omega_b ) * s23 ) 
@@ -45,7 +57,7 @@ def dVdt(t, V, delta, p11_0, p33_0, Dcw):
     f24 = ( 1j * ( ( del_fs - del_cw ) + ( 1 - (780/795) ) * Dcw ) - g24 - Pi ) * s24 + 1j * ( Omega_a * s14 + Omega_b * s34 - np.conj( Omega_c ) * np.conj( s12 ) - np.conj( Omega_c ) * s23 )
     f34 = ( 1j * ( del_fs - (kfs/kcw) * Dcw ) - g34 - Pi ) * s34 + 1j * ( np.conj( Omega_b ) * s24 + np.conj( Omega_c ) * ( p44 - p33 ) - np.conj( Omega_c ) * np.conj( s13 ) )
 
-    return np.array( [ f11, f22, f33, f44, f12, f13, f14, f23, f24, f34 ], complex )
+    return np.array( [ t, f11, f22, f33, f44, f12, f13, f14, f23, f24, f34 ], complex )
 
 # ==========================================================================
 """ RUNGE-KUTTA 4th ORDER, by LEANDRO """
@@ -56,7 +68,18 @@ def rk4( t, V, d, c1, c2, v ):
     k2 = h * dVdt( t + h/2, V + k1[1:]/2, d, c1, c2, v )
     k3 = h * dVdt( t + h/2, V + k2[1:]/2, d, c1, c2, v )
     k4 = h * dVdt( t + h, V + k3[1:], d, c1, c2, v )
-    V += ( k1 + 2*k2 + 2*k3 + k4 )/6
+    V += ( k1[1:] + 2*k2[1:] + 2*k3[1:] + k4[1:] ) / 6
+    return V
+
+
+@njit(fastmath=True)
+def loop( V, delta, a, b):
+    t = 0.0
+    v = 60.
+    for i in range(N):
+        t = t + i*h
+        ans = rk4( t, V, delta, a, b, v)
+        V = ans
     return V
 
 # ==========================================================================
@@ -65,46 +88,23 @@ def rk4( t, V, d, c1, c2, v ):
 p11_0, p33_0 = 0.5, 0.5
 p11, p22, p33, p44, s12, s13, s14, s23, s24, s34 = p11_0, 0., p33_0, 0., 0., 0., 0., 0., 0., 0.
 V0 = np.array( [ p11, p22, p33, p44, s12, s13, s14, s23, s24, s34 ], dtype = complex )
-dd = np.array( [ 0.0, 0.0 ] )   # dd[0] = delta_cw; dd[1] = delta_fs
-Dv = np.linspace( -60.0, 60.0, N + 1, endpoint=True)
-Du = np.sqrt( temp * gas_constant / M ) * kcw
-f_doppler = 1. / np.sqrt( 2 * np.pi * ( Du / kcw)**2 ) * np.exp( - 0.5*(Dv/Du)**2 )
+dd = np.array( [ -100, 0.0 ] )   # dd[0] = delta_cw; dd[1] = delta_fs
+
+# Dv = np.linspace( -60.0, 60.0, N + 1, endpoint=True)
+# Du = np.sqrt( temp * gas_constant / M ) * kcw
+# f_doppler = 1. / np.sqrt( 2 * np.pi * ( Du / kcw)**2 ) * np.exp( - 0.5*(Dv/Du)**2 )
+
 # ==========================================================================
 """ CALCULO DE COERENCIAS """
 # ==========================================================================
 
-sigma = np.zeros(N, dtype=complex)
-rho11 = np.zeros(N, dtype=complex)
-rho22 = np.zeros(N, dtype=complex)
-rho33 = np.zeros(N, dtype=complex)
-rho44 = np.zeros(N, dtype=complex)
-delta_ = np.zeros(N)
+print( loop(V0, dd, p11_0, p33_0) )
 
-for t in range(N+1):
-    ans = rk4()
-
-
-
-# for q in range(N):
-#     dd[0] = inicial + q * h
-#     for i in range(N):
-#         ans = rk4( V0[0] + i*h, V0[1:], dd )
-#         V0 = ans
-#     rho11[q] = np.real(ans[1])
-#     rho22[q] = np.real(ans[2])
-#     rho33[q] = np.real(ans[3])
-#     rho44[q] = np.real(ans[4])
-#     sigma[q] = ans[7]   # COERENCIA sigma_14
-#     delta_[q] = dd[1]
-#     V0 = np.append(t, eq)
 
 # fwmFS = ( sigma * np.conj( sigma ) )
-
 # plt.plot( delta_, np.real(fwmFS), label = 'numeric-RK4', linewidth=1.0, color='r' )
 # plt.title( "$\\Omega_{c}$ = " + str(a) + "$\\Gamma$, $\\Omega_{p}$ = "+str(b)+ "$\\Gamma$, $\\Omega_{fs} = $" + str(c) + "$\\Gamma$, \n $\\gamma_{13} = \\gamma_{24} = $" + str(k) + "$\\Gamma$, $\\delta_{a} = \\delta_{b} = $" + str(dd[0]) )
 # plt.xlabel('$\\delta_{fs} (1/\\Gamma)$')
 # plt.ylabel('$\\left|\\sigma_{14}\\right|^2$')
-
-
-plt.legend(loc="best")
-plt.show()
+# plt.legend(loc="best")
+# plt.show()
